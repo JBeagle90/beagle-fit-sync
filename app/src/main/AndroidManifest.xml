@@ -835,6 +835,12 @@
             android:parentActivityName=".activities.debug.DebugActivityV2"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".beaglefit.BeagleFitActivity"
+            android:exported="false"
+            android:label="@string/beaglefit_title"
+            android:parentActivityName=".activities.ControlCenterv2"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".activities.AboutActivity"
             android:label="@string/about_activity_title"
             android:parentActivityName=".activities.ControlCenterv2"

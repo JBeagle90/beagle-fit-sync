@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beagle Fit Sync's own strings, kept apart from strings.xml so Gadgetbridge updates merge cleanly. -->
+<resources>
+    <string name="beaglefit_title" translatable="false">Beagle Fit</string>
+    <string name="beaglefit_menu" translatable="false">Beagle Fit</string>
+    <string name="beaglefit_intro" translatable="false">After each sync with your watch, this app sends new activity files to your beagle.fit account. beagle.fit adds them to your log the next time you open it.</string>
+    <string name="beaglefit_not_linked" translatable="false">This phone is not linked to a beagle.fit account.</string>
+    <string name="beaglefit_unlinked_by_server" translatable="false">This phone was unlinked on beagle.fit. Link this phone again.</string>
+    <string name="beaglefit_linked" translatable="false">Linked to %1$s as \"%2$s\".</string>
+    <string name="beaglefit_code_help" translatable="false">On beagle.fit, open Profile and make a link code. Type it here within 10 minutes.</string>
+    <string name="beaglefit_code_hint" translatable="false">ABCD-EFGH</string>
+    <string name="beaglefit_link" translatable="false">Link</string>
+    <string name="beaglefit_linking" translatable="false">Linking…</string>
+    <string name="beaglefit_link_done" translatable="false">Linked to %1$s.</string>
+    <string name="beaglefit_code_missing" translatable="false">Type the 8-character code from beagle.fit.</string>
+    <string name="beaglefit_unlink" translatable="false">Unlink this phone</string>
+    <string name="beaglefit_unlink_confirm" translatable="false">This phone will stop sending activities. To remove it from your account too, use Profile on beagle.fit.</string>
+    <string name="beaglefit_queue" translatable="false">Waiting to send: %1$d. Sent so far: %2$d.</string>
+    <string name="beaglefit_last_none" translatable="false">Nothing sent yet.</string>
+    <string name="beaglefit_last" translatable="false">Last: %1$s (%2$s)</string>
+    <string name="beaglefit_send_recent" translatable="false">Send activities from the last 30 days</string>
+    <string name="beaglefit_send_recent_done" translatable="false">%1$d activities added to the queue.</string>
+    <string name="beaglefit_send_now" translatable="false">Try sending now</string>
+    <string name="beaglefit_server" translatable="false">Server</string>
+    <string name="beaglefit_server_hint" translatable="false">https://beagle.fit</string>
+    <string name="beaglefit_save" translatable="false">Save</string>
+    <string name="beaglefit_server_saved" translatable="false">Server set to %1$s.</string>
+    <string name="beaglefit_unlinked_notification" translatable="false">This phone was unlinked on beagle.fit, so activities are not being sent. Tap to link this phone again.</string>
+    <string name="beaglefit_credits" translatable="false">Beagle Fit Sync is built on Gadgetbridge, free software under the GNU AGPL v3. See About for the credits, the licenses and the source.</string>
+</resources>

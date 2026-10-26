@@ -548,6 +548,11 @@ public class FitImporter {
             LOG.error("Failed to copy file to export directory", e);
         }
 
+        // Beagle Fit Sync: queue new activity files for upload to beagle.fit (not on reprocessing).
+        if (fileId.getType() == FileType.FILETYPE.ACTIVITY && !isReprocessing) {
+            nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.onActivityFileSaved(context, finalExportFile);
+        }
+
         try (DBHandler handler = GBApplication.acquireDB()) {
             final DaoSession session = handler.getDaoSession();
 

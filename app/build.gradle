@@ -133,7 +133,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "nodomain.freeyourgadget.gadgetbridge"
+        // Beagle Fit Sync: its own id, so it installs beside Gadgetbridge
+        applicationId "fit.beagle.sync"
 
         // Note: update toolchain.languageVersion when changing targetSdk
         //noinspection OldTargetApi
