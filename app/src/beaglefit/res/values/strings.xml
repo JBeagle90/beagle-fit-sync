@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beagle Fit Sync flavor: its own name, and its own Pebble provider authority so it installs beside Gadgetbridge. -->
+<resources>
+    <string translatable="false" name="pebble_content_provider">studio.beagle.fit.sync.pebble.provider</string>
+    <string translatable="false" name="app_name">Beagle Fit Sync</string>
+    <string translatable="false" name="title_activity_controlcenter">Beagle Fit Sync</string>
+    <string translatable="false" name="about_activity_title">@string/about_activity_title_generic</string>
+    <string translatable="false" name="about_description">@string/about_description_generic</string>
+    <string translatable="false" name="gadgetbridge_running">Beagle Fit Sync running</string>
+</resources>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Beagle Fit Sync (Google Play), Garmin only. A flavor manifest takes precedence over the main one,
+    so this adds what the flavor needs and removes what Play restricts or Garmin sync does not use.
+    The code skips requests for permissions that are not declared (PermissionsUtils.withoutUndeclared).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Uploading activities to beagle.fit (the main manifest strips INTERNET from libraries). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- BLE scans do not derive location here; location is only needed for scans before Android 12. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="30" />
+
+    <!-- Restricted by Google Play policy (SMS and call log, background location, all packages,
+         installing packages, all files) or not needed for Garmin sync. -->
+    <uses-permission android:name="android.permission.READ_SMS" tools:node="remove" />
+    <uses-permission android:name="android.permission.SEND_SMS" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" tools:node="remove" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" tools:node="remove" />
+    <uses-permission android:name="android.permission.CALL_PHONE" tools:node="remove" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:node="remove" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:node="remove" />
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove" />
+    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" tools:node="remove" />
+    <!-- Foreground service types other than connectedDevice need their own Play declaration. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" tools:node="remove" />
+    <!-- Health Connect needs a Play health declaration; Beagle Fit Sync does not write to it. -->
+    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_STEPS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_SLEEP" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_VO2_MAX" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE_VARIABILITY" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_WEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_OXYGEN_SATURATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_SKIN_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_ELEVATION_GAINED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_SPEED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_POWER" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE_ROUTE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_RESPIRATORY_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_RESTING_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_PRESSURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HYDRATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_STEPS_CADENCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_CYCLING_PEDALING_CADENCE" tools:node="remove" />
+    <!-- Other apps' permissions for integrations Garmin sync does not use. -->
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" tools:node="remove" />
+    <uses-permission android:name="nodomain.freeyourgadget.internethelper.INTERNET" tools:node="remove" />
+    <uses-permission android:name="cyanogenmod.permission.ACCESS_WEATHER_MANAGER" tools:node="remove" />
+    <uses-permission android:name="cyanogenmod.permission.READ_WEATHER" tools:node="remove" />
+    <uses-permission android:name="lineageos.permission.ACCESS_WEATHER_MANAGER" tools:node="remove" />
+    <uses-permission android:name="lineageos.permission.READ_WEATHER" tools:node="remove" />
+    <uses-permission android:name="org.omnirom.omnijaws.READ_WEATHER" tools:node="remove" />
+    <uses-permission android:name="app.comaps.permission.READ_NAVIGATION_DATA" tools:node="remove" />
+    <uses-permission android:name="app.comaps.fdroid.permission.READ_NAVIGATION_DATA" tools:node="remove" />
+    <uses-permission android:name="app.comaps.google.permission.READ_NAVIGATION_DATA" tools:node="remove" />
+    <uses-permission android:name="me.hackerchick.catima.READ_CARDS" tools:node="remove" />
+    <uses-permission android:name="me.hackerchick.catima.debug.READ_CARDS" tools:node="remove" />
+    <uses-permission android:name="nz.eloque.foss_wallet.READ_CARDS" tools:node="remove" />
+    <uses-permission android:name="nz.eloque.foss_wallet.dev.READ_CARDS" tools:node="remove" />
+
+    <!-- Without QUERY_ALL_PACKAGES: launcher apps stay visible, so notifications sent to the watch
+         still carry the app's name. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application>
+        <!-- Only the connectedDevice foreground service type is used in this build. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            tools:remove="android:foregroundServiceType" />
+        <service
+            android:name="nodomain.freeyourgadget.gadgetbridge.externalevents.NotificationListener"
+            tools:remove="android:foregroundServiceType" />
+        <service
+            android:name="nodomain.freeyourgadget.gadgetbridge.service.NotificationCollectorMonitorService"
+            tools:node="remove" />
+    </application>
+</manifest>

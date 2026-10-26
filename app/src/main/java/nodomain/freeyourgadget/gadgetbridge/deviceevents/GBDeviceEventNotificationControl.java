@@ -64,7 +64,12 @@ public class GBDeviceEventNotificationControl extends GBDeviceEvent {
                 }
                 if (phoneNumber != null) {
                     LOG.info("Got notification reply for SMS from {} : {}", phoneNumber, reply);
-                    SmsManager.getDefault().sendTextMessage(phoneNumber, null, reply, null, null);
+                    try {
+                        SmsManager.getDefault().sendTextMessage(phoneNumber, null, reply, null, null);
+                    } catch (final SecurityException e) {
+                        // No SEND_SMS permission (the Beagle Fit Sync build does not declare it)
+                        LOG.warn("Cannot send SMS reply", e);
+                    }
                     return;
                 } else {
                     LOG.info("Got notification reply for notification id {} : {}", handle, reply);

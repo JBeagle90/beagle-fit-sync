@@ -311,6 +311,10 @@ public class GBApplication extends Application {
         if (!prefs.getBoolean("prefs_key_enable_deprecated_notificationcollectormonitor", false)) {
             return;
         }
+        if (BuildConfig.BEAGLEFIT) {
+            // Beagle Fit Sync does not declare the specialUse foreground service type this needs
+            return;
+        }
         LOG.info("Starting the deprecated NotificationCollectorMonitorService foreground service.");
         try {
             //the following will ensure the notification manager is kept alive
@@ -447,7 +451,13 @@ public class GBApplication extends Application {
         } else {
             Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
             String[] projection = new String[]{PhoneLookup._ID, PhoneLookup.STARRED};
-            Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+            Cursor cursor;
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
+            } catch (final SecurityException e) {
+                // No contacts permission (the Beagle Fit Sync build does not declare it)
+                return false;
+            }
             boolean exists = false;
             int starred = 0;
             try {

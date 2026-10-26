@@ -325,6 +325,9 @@ public class ControlCenterv2 extends AppCompatActivity
         // Initialize drawer
         NavigationView drawerNavigationView = findViewById(R.id.nav_view);
         drawerNavigationView.setNavigationItemSelectedListener(this);
+        // Beagle Fit Sync: its own screen in its build only; no Gadgetbridge donation link there
+        drawerNavigationView.getMenu().findItem(R.id.action_beaglefit).setVisible(nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT);
+        drawerNavigationView.getMenu().findItem(R.id.donation_link).setVisible(!nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT);
 
         View navigationHeaderView = drawerNavigationView.getHeaderView(0).findViewById(R.id.drawer_header);
         final int headerPaddingLeft = navigationHeaderView.getPaddingLeft();

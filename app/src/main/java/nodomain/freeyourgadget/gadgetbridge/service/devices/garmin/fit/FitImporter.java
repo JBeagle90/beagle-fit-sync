@@ -549,7 +549,7 @@ public class FitImporter {
         }
 
         // Beagle Fit Sync: queue new activity files for upload to beagle.fit (not on reprocessing).
-        if (fileId.getType() == FileType.FILETYPE.ACTIVITY && !isReprocessing) {
+        if (nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT && fileId.getType() == FileType.FILETYPE.ACTIVITY && !isReprocessing) {
             nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.onActivityFileSaved(context, finalExportFile);
         }
 

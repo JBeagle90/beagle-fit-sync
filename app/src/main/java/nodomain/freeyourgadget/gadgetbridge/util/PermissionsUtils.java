@@ -209,7 +209,29 @@ public class PermissionsUtils {
                     activity.getString(R.string.permission_query_all_packages_title),
                     activity.getString(R.string.permission_query_all_packages_summary)));
         }
-        return permissionsList;
+        return withoutUndeclared(activity, permissionsList);
+    }
+
+    /**
+     * Leaves out the permissions this build's manifest does not declare for this Android version
+     * (e.g. the Beagle Fit Sync flavor, which drops SMS, call log, contacts and the like): asking
+     * for them can only fail, so they would be requested again on every start.
+     */
+    private static ArrayList<PermissionDetails> withoutUndeclared(final Activity activity, final ArrayList<PermissionDetails> permissions) {
+        final boolean canDrawOver = isPermissionDeclared(activity, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        final boolean canPolicy = isPermissionDeclared(activity, Manifest.permission.ACCESS_NOTIFICATION_POLICY);
+        final ArrayList<PermissionDetails> result = new ArrayList<>();
+        for (final PermissionDetails p : permissions) {
+            final String name = p.permission();
+            if (name.startsWith("android.permission.") && !isPermissionDeclared(activity, name)) {
+                LOG.debug("Not asking for {}, it is not declared in the manifest", name);
+                continue;
+            }
+            if (CUSTOM_PERM_DISPLAY_OVER.equals(name) && !canDrawOver) continue;
+            if (CUSTOM_PERM_NOTIFICATION_SERVICE.equals(name) && !canPolicy) continue;
+            result.add(p);
+        }
+        return result;
     }
 
     public static boolean checkPermission(Context context, String permission) {

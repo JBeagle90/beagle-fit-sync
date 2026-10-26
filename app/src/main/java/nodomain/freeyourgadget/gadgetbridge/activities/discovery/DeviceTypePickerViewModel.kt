@@ -70,6 +70,10 @@ class DeviceTypePickerViewModel : ViewModel() {
         val i18nGeneric = context.getString(R.string.pref_header_generic)
 
         allEntries = DeviceType.entries.mapNotNull { deviceType ->
+            // Beagle Fit Sync: only Garmin devices in its build
+            if (!nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFitDevices.isOffered(deviceType)) {
+                return@mapNotNull null
+            }
             val coordinator = deviceType.deviceCoordinator
             if (coordinator.connectionType !in connectionTypes) {
                 return@mapNotNull null

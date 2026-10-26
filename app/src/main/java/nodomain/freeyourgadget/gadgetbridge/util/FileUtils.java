@@ -71,7 +71,7 @@ public class FileUtils {
             "com.espruino.gadgetbridge.banglejs",
             "com.espruino.gadgetbridge.banglejs.nightly",
             "com.espruino.gadgetbridge.banglejs.nightly_nopebble",
-            "fit.beagle.sync"
+            "studio.beagle.fit.sync"
     );
 
     /**

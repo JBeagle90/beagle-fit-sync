@@ -61,7 +61,10 @@ class HealthConnectSyncWorker(context: Context, workerParams: WorkerParameters) 
             return Result.failure()
         }
 
-        setForeground(createForegroundInfo())
+        // The Beagle Fit Sync build has no dataSync foreground service type; it syncs as a plain worker
+        if (!nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT) {
+            setForeground(createForegroundInfo())
+        }
         setProgress(
             Data.Builder().putString("progress", applicationContext.getString(R.string.health_connect_syncing)).build()
         )

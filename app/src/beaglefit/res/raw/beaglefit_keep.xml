@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resource shrinking (beaglefit release): keep every string, because some are looked up by
+     name at run time (e.g. WorkoutValueFormatter's getIdentifier for workout summary labels). -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/*" />

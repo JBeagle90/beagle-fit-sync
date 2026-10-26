@@ -50,7 +50,10 @@ class ZipExportWorker(
             return Result.failure()
         }
 
-        setForegroundAsync(createForegroundInfo())
+        // The Beagle Fit Sync build has no dataSync foreground service type; it exports as a plain worker
+        if (!nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT) {
+            setForegroundAsync(createForegroundInfo())
+        }
 
         ZipBackupExportJob(mContext, this, dst.toUri()).run()
 

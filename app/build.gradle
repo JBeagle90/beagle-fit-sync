@@ -133,8 +133,7 @@ android {
     }
 
     defaultConfig {
-        // Beagle Fit Sync: its own id, so it installs beside Gadgetbridge
-        applicationId "fit.beagle.sync"
+        applicationId "nodomain.freeyourgadget.gadgetbridge"
 
         // Note: update toolchain.languageVersion when changing targetSdk
         //noinspection OldTargetApi
@@ -149,6 +148,8 @@ android {
         buildConfigField "String", "GIT_HASH_SHORT", "\"${getGitHashShort()}\""
         buildConfigField "String", "GIT_DIRTY_STATUS", "\"${getGitDirtyFlag()}\""
         buildConfigField "boolean", "INTERNET_ACCESS", "false"
+        // true only in the Beagle Fit Sync flavor (beaglefit): Garmin only, uploads to beagle.fit
+        buildConfigField "boolean", "BEAGLEFIT", "false"
 
         manifestPlaceholders = [
             appAuthRedirectScheme: "${applicationId}"
@@ -162,6 +163,28 @@ android {
                 storePassword System.getProperty("nightly_store_password")
                 keyAlias System.getProperty("nightly_key_alias")
                 keyPassword System.getProperty("nightly_key_password")
+            }
+        }
+
+        // Beagle Fit Sync's Play upload key. The key and its password live outside the repo, in a
+        // keystore.properties file (storeFile, storePassword, keyAlias, keyPassword) named by the
+        // BEAGLEFIT_KEYSTORE_PROPERTIES environment variable or by beaglefit.keystore.properties
+        // in the gitignored local.properties. Without it the beaglefit release build is unsigned.
+        beaglefitUpload {
+            final def localProps = new Properties()
+            final def localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.isFile()) {
+                localPropsFile.withInputStream { localProps.load(it) }
+            }
+            final def keyPropsPath = System.getenv("BEAGLEFIT_KEYSTORE_PROPERTIES") ?: localProps.getProperty("beaglefit.keystore.properties")
+            if (keyPropsPath != null && new File(keyPropsPath).isFile()) {
+                final def keyProps = new Properties()
+                new File(keyPropsPath).withInputStream { keyProps.load(it) }
+                final def keyStoreFile = new File(keyProps.getProperty("storeFile"))
+                storeFile keyStoreFile.isAbsolute() ? keyStoreFile : new File(new File(keyPropsPath).parentFile, keyProps.getProperty("storeFile"))
+                storePassword keyProps.getProperty("storePassword")
+                keyAlias keyProps.getProperty("keyAlias")
+                keyPassword keyProps.getProperty("keyPassword")
             }
         }
     }
@@ -184,6 +207,22 @@ android {
             versionNameSuffix "-banglejs"
             buildConfigField "boolean", "INTERNET_ACCESS", "true"
             // Note: app/src/banglejs/AndroidManifest.xml contains some extra permissions
+        }
+
+        // Beagle Fit Sync (Google Play): Garmin devices only, uploads activities to beagle.fit.
+        // app/src/beaglefit/AndroidManifest.xml adds INTERNET and removes the permissions Play
+        // restricts; src/beaglefitDebug allows plain HTTP for a local test server.
+        beaglefit {
+            dimension "device_type"
+            applicationId "studio.beagle.fit.sync"
+            versionCode 1
+            versionName "1.0.0"
+            // Google Play: new apps and updates must target API 36 from 31 August 2026
+            targetSdk = 36
+            buildConfigField "boolean", "BEAGLEFIT", "true"
+            if (signingConfigs.beaglefitUpload.storeFile != null) {
+                signingConfig = signingConfigs.beaglefitUpload
+            }
         }
     }
 
@@ -279,6 +318,11 @@ android {
 }
 
 androidComponents {
+    // Beagle Fit Sync's Play release: shrink resources too (R8 is already on for release)
+    beforeVariants(selector().withFlavor(new kotlin.Pair("device_type", "beaglefit")).withBuildType("release")) { variantBuilder ->
+        variantBuilder.shrinkResources = true
+    }
+
     onVariants(selector().all()) { variant ->
         variant.resValues.put(
             variant.makeResValueKey("string", "applicationId"),

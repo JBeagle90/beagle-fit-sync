@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Beagle Fit Sync: release builds talk to beagle.fit over HTTPS only.
-     Debug builds allow plain HTTP for a test server on the LAN (src/mainlineDebug). -->
+<!-- Beagle Fit Sync: release builds talk to beagle.fit over HTTPS only, trusting the system CAs.
+     Debug builds allow plain HTTP for a test server on the LAN (src/beaglefitDebug). -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
 </network-security-config>

@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.location.LocationManagerCompat
+import nodomain.freeyourgadget.gadgetbridge.BuildConfig
 
 object DiscoveryRequirements {
     enum class Requirement {
@@ -18,9 +19,18 @@ object DiscoveryRequirements {
         BLUETOOTH_ENABLED,
     }
 
+    /**
+     * BLE scans need location before Android 12. From 12 on, the Beagle Fit Sync build declares
+     * BLUETOOTH_SCAN as neverForLocation and has no location permission, so it does not ask.
+     */
+    private val needsLocation =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S || !BuildConfig.BEAGLEFIT
+
     val permissions: List<String> = buildList {
-        add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        add(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (needsLocation) {
+            add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             add(Manifest.permission.BLUETOOTH_SCAN)
             add(Manifest.permission.BLUETOOTH_CONNECT)
@@ -42,7 +52,7 @@ object DiscoveryRequirements {
             return Requirement.PERMISSIONS_GRANTED
         }
         val locationManager = context.getSystemService<LocationManager>()
-        if (locationManager == null || !LocationManagerCompat.isLocationEnabled(locationManager)) {
+        if (needsLocation && (locationManager == null || !LocationManagerCompat.isLocationEnabled(locationManager))) {
             return Requirement.LOCATION_ENABLED
         }
         if (!adapter.isEnabled) {

@@ -132,6 +132,8 @@ public class DeviceHelper {
     private DeviceType[] getOrderedDeviceTypes() {
         if (orderedDeviceTypes == null) {
             ArrayList<DeviceType> orderedDevices = new ArrayList<>(Arrays.asList(DeviceType.values()));
+            // Beagle Fit Sync: only Garmin devices in its build
+            orderedDevices.removeIf(type -> !nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFitDevices.isOffered(type));
             Collections.sort(orderedDevices, Comparator.comparingInt(dc -> dc.getDeviceCoordinator().getOrderPriority()));
             orderedDeviceTypes = orderedDevices.toArray(new DeviceType[0]);
         }
