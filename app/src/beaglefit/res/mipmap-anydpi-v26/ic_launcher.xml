@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beagle Fit Sync's own icon in place of Gadgetbridge's. No monochrome layer: a themed icon would be the
+     face's outline with no eyes or nose, so Android shows the coloured one. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/beaglefit_icon_background"/>
+    <foreground android:drawable="@drawable/beaglefit_icon_foreground"/>
+</adaptive-icon>

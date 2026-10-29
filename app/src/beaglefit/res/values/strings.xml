@@ -4,7 +4,11 @@
     <string translatable="false" name="pebble_content_provider">studio.beagle.fit.sync.pebble.provider</string>
     <string translatable="false" name="app_name">Beagle Fit Sync</string>
     <string translatable="false" name="title_activity_controlcenter">Beagle Fit Sync</string>
-    <string translatable="false" name="about_activity_title">@string/about_activity_title_generic</string>
-    <string translatable="false" name="about_description">@string/about_description_generic</string>
+    <string translatable="false" name="about_activity_title">About Beagle Fit Sync</string>
+    <string translatable="false" name="about_description">Beagle Fit Sync syncs your Garmin watch over Bluetooth and sends each run to your log on beagle.fit. It is built on Gadgetbridge, free software by the Gadgetbridge contributors, and like Gadgetbridge it is licensed under the GNU AGPL version 3, so its source code is public. Beagle Fit Sync isn’t made by or affiliated with Garmin.</string>
+    <!-- The About screen's three links. The source code link has to stay right: the AGPL asks for it. -->
+    <string translatable="false" name="homepage_url">Beagle Fit: <a href="https://beagle.fit/">https://beagle.fit/</a></string>
+    <string translatable="false" name="codeberg_url">Source code: <a href="https://github.com/JBeagle90/beagle-fit-sync">https://github.com/JBeagle90/beagle-fit-sync</a></string>
+    <string translatable="false" name="fdroid_url">Built on Gadgetbridge: <a href="https://gadgetbridge.org/">https://gadgetbridge.org/</a></string>
     <string translatable="false" name="gadgetbridge_running">Beagle Fit Sync running</string>
 </resources>
