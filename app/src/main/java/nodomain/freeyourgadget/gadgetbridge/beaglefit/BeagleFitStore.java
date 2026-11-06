@@ -62,6 +62,7 @@ public final class BeagleFitStore {
     private static final String K_LAST_TIME = "last_time";
     private static final String K_SENT = "sent_sha256";
     private static final String K_UNLINKED_BY_SERVER = "unlinked_by_server";
+    private static final String K_AUTO_LINK = "auto_link";
 
     /** A queue this long means uploads have not worked for a long time; drop the oldest. */
     static final int MAX_QUEUE = 300;
@@ -124,7 +125,28 @@ public final class BeagleFitStore {
                 .putString(K_PHONE_ID, link.phoneId)
                 .putString(K_PHONE_NAME, link.phoneName)
                 .putBoolean(K_UNLINKED_BY_SERVER, false)
+                .putBoolean(K_AUTO_LINK, true)
                 .apply();
+    }
+
+    /**
+     * Whether beagle.fit's page in the app may link this phone by itself once someone is signed in
+     * (js/app.js on the site). Not after the person unlinked it, or the account did, until they
+     * link it again.
+     */
+    public static boolean autoLink(final Context context) {
+        return prefs(context).getBoolean(K_AUTO_LINK, true) && !wasUnlinkedByServer(context);
+    }
+
+    /** The person unlinked this phone: forget the key, and don't link it again by itself. */
+    public static void unlinkByHand(final Context context) {
+        forgetLink(context, false);
+        prefs(context).edit().putBoolean(K_AUTO_LINK, false).apply();
+    }
+
+    @Nullable
+    public static String phoneId(final Context context) {
+        return prefs(context).getString(K_PHONE_ID, null);
     }
 
     /** Forgets the key. The queue stays, so linking again sends what was waiting. */

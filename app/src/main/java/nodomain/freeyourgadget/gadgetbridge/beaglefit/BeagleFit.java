@@ -155,10 +155,11 @@ public final class BeagleFit {
         return queued;
     }
 
-    /** Tells the person the website unlinked this phone; tapping opens the Beagle Fit screen. */
+    /** Tells the person the website unlinked this phone; tapping opens the site's Watch tab. */
     static void notifyUnlinked(@NonNull final Context context) {
         try {
-            final Intent intent = new Intent(context, BeagleFitActivity.class)
+            final Intent intent = new Intent(context, BeagleFitWebActivity.class)
+                    .putExtra(BeagleFitWebActivity.EXTRA_HASH, "v3/watch")
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             final PendingIntent pi = PendingIntent.getActivity(context, NOTIFICATION_ID_UNLINKED, intent,
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);

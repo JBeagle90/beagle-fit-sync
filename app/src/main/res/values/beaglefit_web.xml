@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Beagle Fit Sync's web screen (BeagleFitWebActivity): beagle.fit's own background colors, so the
+     window matches the site before the page has drawn. values-night has the dark ones. -->
+<resources>
+    <color name="beaglefit_web_bg">#F1F3F5</color>
+    <color name="beaglefit_web_ink">#131B23</color>
+    <style name="BeagleFitWebTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/beaglefit_web_bg</item>
+        <item name="colorPrimary">#0A7D71</item>
+    </style>
+</resources>

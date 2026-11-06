@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- beagle.fit in a WebView, between two strips the size of the status and navigation bars, which the
+     page colors to match itself (BeagleFitWebActivity). The error panel covers the page when it
+     can't load. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/beaglefit_web_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/beaglefit_web_bg"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/beaglefit_web_top"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <WebView
+            android:id="@+id/beaglefit_web"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/beaglefit_web_bg" />
+
+        <LinearLayout
+            android:id="@+id/beaglefit_web_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/beaglefit_web_bg"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/beaglefit_web_offline"
+                android:textColor="@color/beaglefit_web_ink"
+                android:textSize="17sp" />
+
+            <Button
+                android:id="@+id/beaglefit_web_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/beaglefit_web_retry" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/beaglefit_web_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+</LinearLayout>

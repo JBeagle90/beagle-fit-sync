@@ -26,5 +26,9 @@
     <string name="beaglefit_save" translatable="false">Save</string>
     <string name="beaglefit_server_saved" translatable="false">Server set to %1$s.</string>
     <string name="beaglefit_unlinked_notification" translatable="false">This phone was unlinked on beagle.fit, so activities are not being sent. Tap to link this phone again.</string>
+    <string name="beaglefit_web_offline" translatable="false">Beagle Fit couldn\'t be reached. Check that the phone is online, then try again.</string>
+    <string name="beaglefit_web_retry" translatable="false">Try again</string>
+    <string name="beaglefit_web_no_app" translatable="false">No app on this phone can open that link.</string>
+    <string name="beaglefit_web_save_failed" translatable="false">The file couldn\'t be saved.</string>
     <string name="beaglefit_credits" translatable="false">Beagle Fit Sync is built on Gadgetbridge, free software under the GNU AGPL v3. See About for the credits, the licenses and the source.</string>
 </resources>

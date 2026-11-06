@@ -79,7 +79,7 @@ public class BeagleFitActivity extends AbstractGBActivity {
                 .setTitle(R.string.beaglefit_unlink)
                 .setMessage(R.string.beaglefit_unlink_confirm)
                 .setPositiveButton(R.string.beaglefit_unlink, (d, w) -> {
-                    BeagleFitStore.forgetLink(this, false);
+                    BeagleFitStore.unlinkByHand(this);
                     refresh();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

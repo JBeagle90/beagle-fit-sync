@@ -840,6 +840,15 @@
             android:label="@string/beaglefit_title"
             android:parentActivityName=".activities.ControlCenterv2"
             android:windowSoftInputMode="stateHidden" />
+        <!-- Beagle Fit Sync's home screen (the beaglefit flavor's manifest makes it the launcher). -->
+        <activity
+            android:name=".beaglefit.BeagleFitWebActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/BeagleFitWebTheme"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/about_activity_title"

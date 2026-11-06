@@ -100,6 +100,21 @@
     </queries>
 
     <application>
+        <!-- The app opens on beagle.fit itself (BeagleFitWebActivity). Gadgetbridge's home screen is
+             opened from the site's Watch tab, for pairing and the watch's settings. -->
+        <activity
+            android:name="nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFitWebActivity"
+            android:exported="true"
+            tools:replace="android:exported">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="nodomain.freeyourgadget.gadgetbridge.activities.ControlCenterv2">
+            <intent-filter tools:node="removeAll" />
+        </activity>
         <!-- Only the connectedDevice foreground service type is used in this build. -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
