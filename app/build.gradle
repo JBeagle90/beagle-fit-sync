@@ -215,10 +215,12 @@ android {
         beaglefit {
             dimension "device_type"
             applicationId "studio.beagle.fit.sync"
-            versionCode 2
-            versionName "1.0.1"
+            versionCode 3
+            versionName "1.0.2"
             // Google Play: new apps and updates must target API 36 from 31 August 2026
             targetSdk = 36
+            // Play's automatic protection needs Android 7 (API 24) or later
+            minSdk = 24
             buildConfigField "boolean", "BEAGLEFIT", "true"
             if (signingConfigs.beaglefitUpload.storeFile != null) {
                 signingConfig = signingConfigs.beaglefitUpload
