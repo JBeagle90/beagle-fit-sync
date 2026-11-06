@@ -215,8 +215,8 @@ android {
         beaglefit {
             dimension "device_type"
             applicationId "studio.beagle.fit.sync"
-            versionCode 4
-            versionName "1.0.3"
+            versionCode 5
+            versionName "1.0.4"
             // Google Play: new apps and updates must target API 36 from 31 August 2026
             targetSdk = 36
             // Play's automatic protection needs Android 7 (API 24) or later

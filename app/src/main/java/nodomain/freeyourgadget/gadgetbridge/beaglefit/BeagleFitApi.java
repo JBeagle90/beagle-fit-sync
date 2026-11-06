@@ -177,6 +177,9 @@ public class BeagleFitApi {
         final String body;
         try {
             final JSONObject json = new JSONObject();
+            // The key goes in the body and x-bf-key too: on beagle.fit, Azure Static Web Apps replaces
+            // the Authorization header before the API sees it.
+            json.put("key", key);
             json.put("name", fileName);
             json.put("fit", ByteString.of(fit).base64());
             body = json.toString();
@@ -188,6 +191,7 @@ public class BeagleFitApi {
             request = new Request.Builder()
                     .url(baseUrl + "/api/phones/upload")
                     .header("Authorization", "Bearer " + key)
+                    .header("x-bf-key", key)
                     .header("x-bf", "1")
                     .post(RequestBody.create(body, JSON))
                     .build();
