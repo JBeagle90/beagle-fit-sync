@@ -232,6 +232,45 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 });
                 return;
             }
+            case "weights": {
+                // Weigh-ins from Health Connect (BeagleFitWeights): its permission screen, then the last 30 days.
+                final String available = BeagleFitWeights.availability(app);
+                if (!"ok".equals(available)) {
+                    activity.openHealthConnect();
+                    answer(reply, id, error("update".equals(available)
+                            ? "Health Connect needs an update. Update it on Google Play, then try again."
+                            : "This phone doesn't have Health Connect. Install it from Google Play, then try again."));
+                    return;
+                }
+                activity.askWeights(on -> main.post(() -> {
+                    try {
+                        answer(reply, id, on
+                                ? ok().put("status", status())
+                                : new JSONObject().put("ok", false).put("declined", true).put("status", status()));
+                    } catch (final JSONException e) {
+                        answer(reply, id, okQuietly());
+                    }
+                }));
+                return;
+            }
+            case "weightsNow":
+                BeagleFitWeights.collectAsync(app, n -> main.post(() -> {
+                    try {
+                        answer(reply, id, n < 0
+                                ? error("Couldn't read Health Connect. Open the app again and try once more.")
+                                : ok().put("queued", n));
+                    } catch (final JSONException e) {
+                        answer(reply, id, okQuietly());
+                    }
+                }));
+                return;
+            case "weightsOff":
+                BeagleFitWeights.turnOff(app, () -> main.post(() -> answer(reply, id, okQuietly())));
+                return;
+            case "health":
+                activity.openHealthConnect();
+                answer(reply, id, ok());
+                return;
             case "print":
                 activity.print(m.optString("title", "Beagle Fit"), () -> main.post(() -> answer(reply, id, okQuietly())));
                 return;
@@ -242,7 +281,7 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
 
     // ---------- status
 
-    /** What the page's Watch tab shows: the link, the queue, and each watch. */
+    /** What the page's Watch tab shows: the link, the queue, each watch, and weigh-ins from Health Connect. */
     @NonNull
     JSONObject status() throws JSONException {
         final JSONObject s = new JSONObject()
@@ -257,7 +296,8 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 .put("sent", BeagleFitStore.sentCount(app))
                 .put("last", BeagleFitStore.lastResult(app))
                 .put("lastAt", BeagleFitStore.lastResultTime(app))
-                .put("setUp", !GBApplication.getPrefs().getBoolean("first_run", true));
+                .put("setUp", !GBApplication.getPrefs().getBoolean("first_run", true))
+                .put("weights", BeagleFitWeights.status(app));
         final JSONArray watches = new JSONArray();
         for (final GBDevice device : devices()) {
             watches.put(new JSONObject()

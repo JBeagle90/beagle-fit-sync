@@ -231,6 +231,24 @@ public final class BeagleFitStore {
             if (!FitActivityCheck.isActivity(data)) {
                 return QueueResult.NOT_ACTIVITY;
             }
+            return enqueueData(context, source.getName(), data);
+        } catch (final IOException | RuntimeException e) {
+            LOG.error("Beagle Fit: failed to queue {}", source, e);
+            return QueueResult.ERROR;
+        }
+    }
+
+    /**
+     * Queues a FIT file made on the phone (weigh-ins from Health Connect: BeagleFitWeights), unless
+     * the same bytes were sent or queued before.
+     */
+    @NonNull
+    public static synchronized QueueResult enqueueData(final Context context, final String name, final byte[] data) {
+        try {
+            if (data.length > BeagleFitApi.MAX_FILE_BYTES) {
+                LOG.info("Beagle Fit: not queueing {}, bigger than 1 MB", name);
+                return QueueResult.TOO_BIG;
+            }
             final String sha = sha256(data);
             if (wasSent(context, sha)) {
                 return QueueResult.ALREADY_SENT;
@@ -238,8 +256,8 @@ public final class BeagleFitStore {
             final File dir = queueDir(context);
             final String[] existing = dir.list();
             if (existing != null) {
-                for (final String name : existing) {
-                    if (name.startsWith(sha)) {
+                for (final String queued : existing) {
+                    if (queued.startsWith(sha)) {
                         return QueueResult.ALREADY_QUEUED;
                     }
                 }
@@ -249,7 +267,7 @@ public final class BeagleFitStore {
                 out.write(data);
                 out.getFD().sync();
             }
-            final File target = new File(dir, sha + "-" + safeName(source.getName()));
+            final File target = new File(dir, sha + "-" + safeName(name));
             if (!tmp.renameTo(target)) {
                 //noinspection ResultOfMethodCallIgnored
                 tmp.delete();
@@ -261,7 +279,7 @@ public final class BeagleFitStore {
             LOG.info("Beagle Fit: queued {}", target.getName());
             return QueueResult.QUEUED;
         } catch (final IOException | RuntimeException e) {
-            LOG.error("Beagle Fit: failed to queue {}", source, e);
+            LOG.error("Beagle Fit: failed to queue {}", name, e);
             return QueueResult.ERROR;
         }
     }

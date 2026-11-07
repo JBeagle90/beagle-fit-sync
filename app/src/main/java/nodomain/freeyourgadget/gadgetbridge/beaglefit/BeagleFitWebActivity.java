@@ -56,6 +56,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.health.connect.client.HealthConnectClient;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import nodomain.freeyourgadget.gadgetbridge.BuildConfig;
@@ -98,6 +100,8 @@ public class BeagleFitWebActivity extends AppCompatActivity {
     @Nullable private Consumer<Uri> pendingSave;
     private ActivityResultLauncher<Intent> pickFiles;
     private ActivityResultLauncher<Intent> createFile;
+    @Nullable private Consumer<Boolean> pendingWeights;
+    private ActivityResultLauncher<Set<String>> askHealth;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -145,6 +149,14 @@ public class BeagleFitWebActivity extends AppCompatActivity {
             final Consumer<Uri> done = pendingSave;
             pendingSave = null;
             if (done != null) done.accept(result.getResultCode() == RESULT_OK && result.getData() != null ? result.getData().getData() : null);
+        });
+        // Health Connect's own screen; what was allowed is read back from Health Connect itself.
+        askHealth = registerForActivityResult(BeagleFitWeights.permissionContract(), granted -> {
+            final Consumer<Boolean> done = pendingWeights;
+            pendingWeights = null;
+            BeagleFitWeights.afterPermissions(this, on -> {
+                if (done != null) done.accept(on);
+            });
         });
 
         baseUrl = BeagleFitStore.baseUrl(this);
@@ -277,6 +289,8 @@ public class BeagleFitWebActivity extends AppCompatActivity {
         // A new server address on the Beagle Fit screen: the page, its sign-in and the bridge's
         // origin all belong to the old one.
         if (!Objects.equals(baseUrl, BeagleFitStore.baseUrl(this))) recreate();
+        // Health Connect always lets an app read while it's open: new weigh-ins come in now.
+        else if (BeagleFitWeights.isOn(this)) BeagleFitWeights.collectAsync(this);
     }
 
     @Override
@@ -370,6 +384,35 @@ public class BeagleFitWebActivity extends AppCompatActivity {
     /** Gadgetbridge's home screen: the watch's card, its settings, and the Beagle Fit screen in the menu. */
     void openWatchSettings() {
         startActivity(new Intent(this, ControlCenterv2.class));
+    }
+
+    /** Health Connect's screen asking to read weight and body fat. done gets whether reading weight is allowed. */
+    void askWeights(@NonNull final Consumer<Boolean> done) {
+        if (pendingWeights != null) pendingWeights.accept(false);
+        pendingWeights = done;
+        try {
+            askHealth.launch(BeagleFitWeights.permissionsToAsk(this));
+        } catch (final ActivityNotFoundException e) {
+            pendingWeights = null;
+            done.accept(false);
+        }
+    }
+
+    /** Health Connect's settings (where its permissions for each app are), or its Play listing to install or update it. */
+    void openHealthConnect() {
+        try {
+            if ("ok".equals(BeagleFitWeights.availability(this))) {
+                startActivity(new Intent(HealthConnectClient.getHealthConnectSettingsAction()));
+                return;
+            }
+        } catch (final ActivityNotFoundException e) {
+            // falls through to Google Play
+        }
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.healthdata")));
+        } catch (final ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")));
+        }
     }
 
     /** Android's save screen, then the text written to the file. done gets null on success, else why not. */

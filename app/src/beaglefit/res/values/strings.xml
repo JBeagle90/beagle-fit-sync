@@ -11,4 +11,7 @@
     <string translatable="false" name="codeberg_url">Source code: <a href="https://github.com/JBeagle90/beagle-fit-sync">https://github.com/JBeagle90/beagle-fit-sync</a></string>
     <string translatable="false" name="fdroid_url">Built on Gadgetbridge: <a href="https://gadgetbridge.org/">https://gadgetbridge.org/</a></string>
     <string translatable="false" name="gadgetbridge_running">Beagle Fit Sync running</string>
+    <!-- Health Connect shows this screen from its permissions page (PermissionsRationaleActivity). -->
+    <string translatable="false" name="health_connect_permissions_rationale_title">Weigh-ins from Health Connect</string>
+    <string translatable="false" name="health_connect_permissions_rationale_message">With your permission, Beagle Fit Sync reads your weigh-ins (weight and body fat) from Health Connect, such as the ones Garmin Connect saves there from a Garmin Index scale, and sends them to your log on beagle.fit, the account this phone is linked to. It reads nothing else from Health Connect and writes nothing to it. You can stop it on the app\'s Watch tab or in Health Connect\'s settings. Beagle Fit\'s privacy policy is at https://beagle.fit/legal/privacy.html.</string>
 </resources>
