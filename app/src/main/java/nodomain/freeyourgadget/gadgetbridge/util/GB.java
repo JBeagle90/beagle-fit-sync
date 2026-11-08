@@ -62,6 +62,7 @@ import nodomain.freeyourgadget.gadgetbridge.GBEnvironment;
 import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.activities.ControlCenterv2;
 import nodomain.freeyourgadget.gadgetbridge.activities.SettingsActivity;
+import nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit;
 import nodomain.freeyourgadget.gadgetbridge.deviceevents.GBDeviceEventScreenshot;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
@@ -199,11 +200,20 @@ public class GB {
         notificationChannelsCreated = true;
     }
 
-    private static PendingIntent getContentIntent(Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
-        notificationIntent.setPackage(BuildConfig.APPLICATION_ID);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+    /** What tapping a notification opens. Beagle Fit Sync opens beagle.fit's page instead of the home screen. */
+    private static Intent mainScreenIntent(Context context) {
+        if (BuildConfig.BEAGLEFIT) {
+            return BeagleFit.homeIntent(context);
+        }
+        Intent intent = new Intent(context, ControlCenterv2.class);
+        intent.setPackage(BuildConfig.APPLICATION_ID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return intent;
+    }
+
+    private static PendingIntent getContentIntent(Context context) {
+        Intent notificationIntent = mainScreenIntent(context);
 
         return PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
     }
@@ -635,10 +645,7 @@ public class GB {
 
     private static Notification createTransferNotification(CharSequence title, CharSequence text, boolean ongoing,
                                                            int percentage, Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
-        notificationIntent.setPackage(BuildConfig.APPLICATION_ID);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent notificationIntent = mainScreenIntent(context);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder nb = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_TRANSFER)
@@ -677,10 +684,7 @@ public class GB {
 
     private static Notification createInstallNotification(CharSequence text, boolean ongoing,
                                                           int percentage, Context context) {
-        Intent notificationIntent = new Intent(context, ControlCenterv2.class);
-        notificationIntent.setPackage(BuildConfig.APPLICATION_ID);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent notificationIntent = mainScreenIntent(context);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder nb = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)

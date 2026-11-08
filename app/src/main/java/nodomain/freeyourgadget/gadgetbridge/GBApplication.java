@@ -156,7 +156,9 @@ public class GBApplication extends Application {
 
         GBDatabaseManager.closeDatabase();
 
-        final Intent startActivity = new Intent(context, ControlCenterv2.class);
+        final Intent startActivity = BuildConfig.BEAGLEFIT
+                ? nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.homeIntent(context)
+                : new Intent(context, ControlCenterv2.class);
         final PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 1337,

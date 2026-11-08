@@ -99,7 +99,9 @@ public class Widget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.todaywidget_header_container, refreshDataIntent);
 
         //open GB main window
-        Intent startMainIntent = new Intent(context, ControlCenterv2.class);
+        Intent startMainIntent = BuildConfig.BEAGLEFIT
+                ? nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.homeIntent(context)
+                : new Intent(context, ControlCenterv2.class);
         startMainIntent.setPackage(BuildConfig.APPLICATION_ID);
         PendingIntent startMainPIntent = PendingIntent.getActivity(
                 context,

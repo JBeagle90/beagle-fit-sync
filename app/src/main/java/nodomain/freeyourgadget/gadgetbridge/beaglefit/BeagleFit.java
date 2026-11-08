@@ -62,6 +62,21 @@ public final class BeagleFit {
     }
 
     /**
+     * What the launcher icon opens: beagle.fit's page, its task brought to the front as it was left
+     * (the activity is singleTask, and an intent without a hash doesn't reload it). Gadgetbridge's
+     * notifications, its widget and its restart open this in this build instead of its home screen,
+     * which only the Watch tab opens.
+     */
+    @NonNull
+    public static Intent homeIntent(@NonNull final Context context) {
+        return new Intent(context, BeagleFitWebActivity.class)
+                .setAction(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_LAUNCHER)
+                .setPackage(context.getPackageName())
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    /**
      * Called by FitImporter once a FIT file whose file_id says "activity" is in Gadgetbridge's
      * export folder. Queues a copy and starts the upload. Never throws: a problem here must not
      * break the watch sync.

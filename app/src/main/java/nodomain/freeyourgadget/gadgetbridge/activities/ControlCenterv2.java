@@ -241,6 +241,8 @@ public class ControlCenterv2 extends AppCompatActivity
         for (String token : mainScreensPref) {
             NavTab tab = NavTab.fromKey(token.trim());
             if (tab == null || !seen.add(tab)) continue;
+            // Beagle Fit Sync: beagle.fit is the app's front page, so only the watch's card is shown here
+            if (nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT && tab != NavTab.DEVICES) continue;
             if (tab == NavTab.DASHBOARD && !supportsActivityTracking) continue;
             if (tab == NavTab.WORKOUTS && !supportsRecordedActivities) continue;
             tabs.add(tab);

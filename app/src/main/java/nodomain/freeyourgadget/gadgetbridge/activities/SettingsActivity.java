@@ -525,9 +525,10 @@ public class SettingsActivity extends AbstractSettingsActivityV2 implements Acti
             }
 
             if (nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT) {
-                // Beagle Fit Sync declares no Health Connect permissions, and Sleep as Android
-                // does not work with Garmin watches
-                for (final String key : new String[]{"pref_category_healthconnect", "pref_category_sleepasandroid"}) {
+                // Beagle Fit Sync declares no Health Connect permissions, Sleep as Android
+                // does not work with Garmin watches, and the home screen shows only the watch's card
+                for (final String key : new String[]{"pref_category_healthconnect", "pref_category_sleepasandroid",
+                        "display_bottom_navigation_bar", "main_screens", "default_main_screen"}) {
                     final Preference hidden = findPreference(key);
                     if (hidden != null) hidden.setVisible(false);
                 }
