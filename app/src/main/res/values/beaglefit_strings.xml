@@ -18,8 +18,9 @@
     <string name="beaglefit_queue" translatable="false">Waiting to send: %1$d. Sent so far: %2$d.</string>
     <string name="beaglefit_last_none" translatable="false">Nothing sent yet.</string>
     <string name="beaglefit_last" translatable="false">Last: %1$s (%2$s)</string>
-    <string name="beaglefit_send_recent" translatable="false">Send activities from the last 30 days</string>
-    <string name="beaglefit_send_recent_done" translatable="false">%1$d activities added to the queue.</string>
+    <string name="beaglefit_send_recent" translatable="false">Send every run</string>
+    <string name="beaglefit_send_recent_done" translatable="false">%1$d activities added to the queue. Runs the watch still has come as it sends them.</string>
+    <string name="beaglefit_send_recent_no_watch" translatable="false">%1$d activities added to the queue. Connect your watch and tap this again for the runs it still has.</string>
     <string name="beaglefit_send_now" translatable="false">Try sending now</string>
     <string name="beaglefit_server" translatable="false">Server</string>
     <string name="beaglefit_server_hint" translatable="false">https://beagle.fit</string>

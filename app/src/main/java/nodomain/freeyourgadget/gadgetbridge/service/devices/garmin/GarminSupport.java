@@ -2141,6 +2141,12 @@ public class GarminSupport extends AbstractBTLESingleDeviceSupport implements IC
                     }
                 }
 
+                // Beagle Fit Sync: remember the run, so "Send every run" doesn't download it again.
+                if (BuildConfig.BEAGLEFIT && gdiFile != null && gdiFile.hasUid() && filetype == FileType.FILETYPE.ACTIVITY) {
+                    nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.onWatchRunSaved(getContext(),
+                            gdiFile.getUid().getMostSignificant(), gdiFile.getUid().getLeastSignificant());
+                }
+
                 if (gdiFile != null && !getKeepActivityDataOnDevice()) { // delete file from watch upon successful download
                     final GdiFileAccess.Service syncedCommand = protocolBufferHandler.getFileSyncServiceHandler()
                             .markSynced(gdiFile);

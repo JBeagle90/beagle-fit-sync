@@ -45,6 +45,8 @@ import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.database.DBHandler;
 import nodomain.freeyourgadget.gadgetbridge.entities.BaseActivitySummary;
 import nodomain.freeyourgadget.gadgetbridge.entities.BaseActivitySummaryDao;
+import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
+import nodomain.freeyourgadget.gadgetbridge.model.RecordedDataTypes;
 import nodomain.freeyourgadget.gadgetbridge.util.FileUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.GB;
 
@@ -112,14 +114,66 @@ public final class BeagleFit {
     }
 
     /**
-     * Queues the activity FIT files Gadgetbridge already has from the last {@code days} days: the
-     * files behind its workouts list, and any activity files in its export folders. Files sent
-     * before are left out. Runs on a background thread (it reads the database and the files).
+     * Called once a run downloaded with the newer sync protocol is saved, with the watch's id for
+     * the file. Never throws, like the hook above.
+     */
+    public static void onWatchRunSaved(@NonNull final Context context, final long idHigh, final long idLow) {
+        try {
+            BeagleFitStore.addWatchRun(context, watchRunId(idHigh, idLow));
+        } catch (final Throwable t) {
+            LOG.error("Beagle Fit: failed to remember a run from the watch", t);
+        }
+    }
+
+    public static boolean hasWatchRun(@NonNull final Context context, final long idHigh, final long idLow) {
+        return BeagleFitStore.hasWatchRun(context, watchRunId(idHigh, idLow));
+    }
+
+    private static String watchRunId(final long idHigh, final long idLow) {
+        return Long.toHexString(idHigh) + ":" + Long.toHexString(idLow);
+    }
+
+    // "Send every run": a watch on the newer sync protocol lists only the files it hasn't marked as
+    // synced, so a run Garmin Connect took never reaches this app. The next file listing asks for
+    // every run on the watch instead (FileSyncServiceHandler), if it starts within a few minutes.
+    private static volatile long everyRunAskedAt;
+    private static final long EVERY_RUN_WAIT = TimeUnit.MINUTES.toMillis(5);
+
+    /**
+     * Asks each connected watch for every run it holds, synced or not. Runs the phone already has
+     * aren't downloaded again (old protocol: by their file name; newer: by the watch's id), and runs
+     * sent before aren't sent again (by their bytes).
+     *
+     * @return whether a watch was connected to ask
+     */
+    public static boolean askWatchForEveryRun() {
+        boolean any = false;
+        for (final GBDevice device : GBApplication.app().getDeviceManager().getDevices()) {
+            any |= device.isInitialized();
+        }
+        if (!any) return false;
+        everyRunAskedAt = System.currentTimeMillis();
+        GBApplication.deviceService().onFetchRecordedData(RecordedDataTypes.TYPE_SYNC);
+        return true;
+    }
+
+    /** True once for a listing that starts soon after {@link #askWatchForEveryRun()}. */
+    public static boolean takeEveryRunRequest() {
+        final long at = everyRunAskedAt;
+        everyRunAskedAt = 0;
+        return at > 0 && System.currentTimeMillis() - at < EVERY_RUN_WAIT;
+    }
+
+    /**
+     * Queues the activity FIT files Gadgetbridge already has from the last {@code days} days (every
+     * one when {@code days} is 0): the files behind its workouts list, and any activity files in its
+     * export folders. Files sent before are left out. Runs on a background thread (it reads the
+     * database and the files).
      *
      * @return how many files were added to the queue
      */
     public static int queueRecent(@NonNull final Context context, final int days) {
-        final long since = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days);
+        final long since = days > 0 ? System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days) : 0;
         final Set<File> candidates = new LinkedHashSet<>();
 
         try (DBHandler db = GBApplication.acquireDbReadOnly()) {

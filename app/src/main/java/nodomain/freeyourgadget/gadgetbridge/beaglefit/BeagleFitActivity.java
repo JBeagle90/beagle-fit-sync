@@ -180,11 +180,13 @@ public class BeagleFitActivity extends AbstractGBActivity {
         final Context app = getApplicationContext();
         sendRecent.setEnabled(false);
         executor.execute(() -> {
-            final int queued = BeagleFit.queueRecent(app, 30);
+            final int queued = BeagleFit.queueRecent(app, 0);
+            final boolean watch = BeagleFit.askWatchForEveryRun();
             runOnUiThread(() -> {
                 if (isFinishing() || isDestroyed()) return;
                 sendRecent.setEnabled(true);
-                Toast.makeText(this, getString(R.string.beaglefit_send_recent_done, queued), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(watch ? R.string.beaglefit_send_recent_done : R.string.beaglefit_send_recent_no_watch, queued),
+                        Toast.LENGTH_LONG).show();
                 refresh();
             });
         });

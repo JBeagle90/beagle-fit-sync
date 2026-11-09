@@ -61,6 +61,7 @@ public final class BeagleFitStore {
     private static final String K_LAST_RESULT = "last_result";
     private static final String K_LAST_TIME = "last_time";
     private static final String K_SENT = "sent_sha256";
+    private static final String K_WATCH_RUNS = "watch_runs";
     private static final String K_UNLINKED_BY_SERVER = "unlinked_by_server";
     private static final String K_AUTO_LINK = "auto_link";
 
@@ -205,6 +206,21 @@ public final class BeagleFitStore {
 
     public static int sentCount(final Context context) {
         return prefs(context).getStringSet(K_SENT, new HashSet<>()).size();
+    }
+
+    /**
+     * The runs the phone has downloaded with the newer sync protocol, by the watch's id for each,
+     * so "Send every run" doesn't download them from the watch again.
+     */
+    public static synchronized boolean hasWatchRun(final Context context, final String uid) {
+        return prefs(context).getStringSet(K_WATCH_RUNS, new HashSet<>()).contains(uid);
+    }
+
+    public static synchronized void addWatchRun(final Context context, final String uid) {
+        final Set<String> runs = new HashSet<>(prefs(context).getStringSet(K_WATCH_RUNS, new HashSet<>()));
+        if (runs.add(uid)) {
+            prefs(context).edit().putStringSet(K_WATCH_RUNS, runs).apply();
+        }
     }
 
     // ---------- queue

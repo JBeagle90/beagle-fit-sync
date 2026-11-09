@@ -30,6 +30,11 @@ class FileSyncServiceHandler(val deviceSupport: GarminSupport) {
     private var nextPageId: Int? = null
     private var cursorId: Int? = null
 
+    // Beagle Fit Sync: a listing of every run on the watch, synced ones too ("Send every run").
+    // It starts from the first page and puts the ordinary listing's place back when it's done.
+    private var everyRun = false
+    private var pageIdBeforeEveryRun: Int? = null
+
     fun handle(fileSyncService: GdiFileAccess.Service): GdiFileAccess.Service? {
         return when {
             fileSyncService.hasItemAddedNotification() -> handleItemAddedNotification(fileSyncService.itemAddedNotification)
@@ -142,7 +147,7 @@ class FileSyncServiceHandler(val deviceSupport: GarminSupport) {
                 null
             }
 
-            conditionallyDownload(file, typeName)
+            conditionallyDownload(file, typeName, everyRun)
         }
 
         // #5461 - some watches to not send the next page ID
@@ -160,17 +165,28 @@ class FileSyncServiceHandler(val deviceSupport: GarminSupport) {
                 "continue file list",
                 Smart.newBuilder().setFileAccessService(requestFileList()).build()
             )
+        } else if (everyRun) {
+            everyRun = false
+            nextPageId = pageIdBeforeEveryRun
         }
 
         return null
     }
 
     fun requestFileList(): GdiFileAccess.Service {
-        LOG.debug("Requesting file list starting at page {} (cursorId={})", nextPageId, cursorId)
+        if (cursorId == null && nodomain.freeyourgadget.gadgetbridge.BuildConfig.BEAGLEFIT) {
+            if (everyRun) nextPageId = pageIdBeforeEveryRun // the last one never finished
+            everyRun = nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.takeEveryRunRequest()
+            if (everyRun) {
+                pageIdBeforeEveryRun = nextPageId
+                nextPageId = null
+            }
+        }
+        LOG.debug("Requesting file list starting at page {} (cursorId={}, everyRun={})", nextPageId, cursorId, everyRun)
 
         val fileListRequestBuilder = GdiFileAccess.ItemListRequest.newBuilder().apply {
             // Exclusion flags? If we omit this, it sends back already synced files going back months.
-            addExcludeAllFlags(GdiDataTypes.UUID.newBuilder().setMostSignificant(FLAGS_SYNCED).setLeastSignificant(FLAGS_SYNCED).build())
+            if (!everyRun) addExcludeAllFlags(GdiDataTypes.UUID.newBuilder().setMostSignificant(FLAGS_SYNCED).setLeastSignificant(FLAGS_SYNCED).build())
             addGetFlags(GdiDataTypes.UUID.newBuilder().setMostSignificant(FLAGS_SYNCED).setLeastSignificant(FLAGS_SYNCED).build())
         }
 
@@ -233,7 +249,7 @@ class FileSyncServiceHandler(val deviceSupport: GarminSupport) {
         }
     }
 
-    private fun conditionallyDownload(file: GdiFileAccess.ItemReference, rawTypeName: String?) {
+    private fun conditionallyDownload(file: GdiFileAccess.ItemReference, rawTypeName: String?, everyRun: Boolean = false) {
         var computedName: String? = null;
         if (rawTypeName == null || rawTypeName.length < 1) {
             if (file.hasDataType() && file.dataType.hasGdxmlString()) {
@@ -262,6 +278,17 @@ class FileSyncServiceHandler(val deviceSupport: GarminSupport) {
             }
         } else {
             computedName
+        }
+
+        if (everyRun) {
+            // Runs only: the other files come with the next ordinary sync, and the listing has
+            // everything back months.
+            if (fileType != FILETYPE.ACTIVITY) return
+            if (file.hasUid() && nodomain.freeyourgadget.gadgetbridge.beaglefit.BeagleFit.hasWatchRun(
+                    deviceSupport.context, file.uid.mostSignificant, file.uid.leastSignificant)) {
+                LOG.debug("Already have run {}/{}", file.uid.mostSignificant, file.uid.leastSignificant)
+                return
+            }
         }
 
         if (!deviceSupport.devicePrefs.fetchUnknownFiles) {

@@ -210,6 +210,20 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                     });
                 });
                 return;
+            case "every":
+                // Every run the phone has, then every run on the watch (synced ones too).
+                executor.execute(() -> {
+                    final int queued = BeagleFit.queueRecent(app, 0);
+                    final boolean watch = BeagleFit.askWatchForEveryRun();
+                    main.post(() -> {
+                        try {
+                            answer(reply, id, ok().put("queued", queued).put("watch", watch));
+                        } catch (final JSONException e) {
+                            answer(reply, id, okQuietly());
+                        }
+                    });
+                });
+                return;
             case "pair":
                 activity.openPairing();
                 answer(reply, id, ok());
@@ -297,6 +311,7 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 .put("last", BeagleFitStore.lastResult(app))
                 .put("lastAt", BeagleFitStore.lastResultTime(app))
                 .put("setUp", !GBApplication.getPrefs().getBoolean("first_run", true))
+                .put("everyRun", true) // the "every" op is here (1.3.0)
                 .put("weights", BeagleFitWeights.status(app));
         final JSONArray watches = new JSONArray();
         for (final GBDevice device : devices()) {
