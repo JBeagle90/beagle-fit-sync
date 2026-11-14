@@ -30,6 +30,7 @@ import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -74,6 +75,7 @@ import nodomain.freeyourgadget.gadgetbridge.GBApplication;
 import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.activities.ControlCenterv2;
 import nodomain.freeyourgadget.gadgetbridge.activities.discovery.DiscoveryActivityV2;
+import nodomain.freeyourgadget.gadgetbridge.util.GB;
 
 /**
  * Beagle Fit Sync's home screen: beagle.fit itself in a WebView, so the app looks like the site and
@@ -384,6 +386,24 @@ public class BeagleFitWebActivity extends AppCompatActivity {
     /** Gadgetbridge's home screen: the watch's card, its settings, and the Beagle Fit screen in the menu. */
     void openWatchSettings() {
         startActivity(new Intent(this, ControlCenterv2.class));
+    }
+
+    /**
+     * The phone's setting for the always-on "connected" notification (Android 8 and later). Android
+     * raises an app's own minimized foreground-service notification back to Low, which shows an icon
+     * in the top bar, but keeps it minimized when the member chooses that there.
+     */
+    void openTopBarSetting() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        GB.createNotificationChannels(this);
+        try {
+            startActivity(new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName())
+                    .putExtra(Settings.EXTRA_CHANNEL_ID, GB.NOTIFICATION_CHANNEL_ID_CONNECTION_STATUS));
+        } catch (final ActivityNotFoundException e) {
+            startActivity(new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName()));
+        }
     }
 
     /** Health Connect's screen asking to read weight and body fat. done gets whether reading weight is allowed. */

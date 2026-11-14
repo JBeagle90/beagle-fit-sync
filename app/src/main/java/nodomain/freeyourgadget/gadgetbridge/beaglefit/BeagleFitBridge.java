@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 package nodomain.freeyourgadget.gadgetbridge.beaglefit;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +32,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.webkit.JavaScriptReplyProxy;
@@ -56,6 +59,7 @@ import nodomain.freeyourgadget.gadgetbridge.GBApplication;
 import nodomain.freeyourgadget.gadgetbridge.devices.DeviceManager;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.RecordedDataTypes;
+import nodomain.freeyourgadget.gadgetbridge.util.GB;
 
 /**
  * The bridge between beagle.fit's page and the app: window.BFApp on the page (js/app.js on the
@@ -285,6 +289,10 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 activity.openHealthConnect();
                 answer(reply, id, ok());
                 return;
+            case "topBar":
+                activity.openTopBarSetting();
+                answer(reply, id, ok());
+                return;
             case "print":
                 activity.print(m.optString("title", "Beagle Fit"), () -> main.post(() -> answer(reply, id, okQuietly())));
                 return;
@@ -313,6 +321,10 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 .put("setUp", !GBApplication.getPrefs().getBoolean("first_run", true))
                 .put("everyRun", true) // the "every" op is here (1.3.0)
                 .put("weights", BeagleFitWeights.status(app));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // The "topBar" op is here (1.3.1); hidden once the member has minimized the connected notification.
+            s.put("topBar", new JSONObject().put("hidden", topBarHidden()));
+        }
         final JSONArray watches = new JSONArray();
         for (final GBDevice device : devices()) {
             watches.put(new JSONObject()
@@ -323,6 +335,16 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                     .put("busy", device.isBusy() ? device.getBusyTask() : JSONObject.NULL));
         }
         return s.put("watches", watches);
+    }
+
+    /** Whether the connected notification stays out of the top bar: minimized, turned off, or all notifications off. */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private boolean topBarHidden() {
+        if (!NotificationManagerCompat.from(app).areNotificationsEnabled()) return true;
+        GB.createNotificationChannels(app);
+        final NotificationChannel channel = app.getSystemService(NotificationManager.class)
+                .getNotificationChannel(GB.NOTIFICATION_CHANNEL_ID_CONNECTION_STATUS);
+        return channel != null && channel.getImportance() <= NotificationManager.IMPORTANCE_MIN;
     }
 
     @NonNull
