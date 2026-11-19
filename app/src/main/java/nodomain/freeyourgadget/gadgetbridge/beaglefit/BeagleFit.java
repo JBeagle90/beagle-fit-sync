@@ -157,6 +157,28 @@ public final class BeagleFit {
         return true;
     }
 
+    /**
+     * Connects each paired watch that is "Not connected", as tapping its card does. Gadgetbridge
+     * reconnects by itself after a dropped link, but a watch that ends up Not connected stays that way
+     * until someone asks. Its own scanning for watches would do this too, but that runs a second
+     * service with a second notification in the top bar.
+     *
+     * @return how many watches it asked to connect
+     */
+    public static int connectWatches() {
+        // Before the welcome screens have asked for the Bluetooth permissions there's nothing to connect to.
+        if (GBApplication.getPrefs().getBoolean("first_run", true)) return 0;
+        int asked = 0;
+        for (final GBDevice device : GBApplication.app().getDeviceManager().getDevices()) {
+            if (device.getState() != GBDevice.State.NOT_CONNECTED) continue;
+            if (!device.getDeviceCoordinator().isConnectable()) continue;
+            LOG.info("Beagle Fit: connecting to {}", device.getAliasOrName());
+            GBApplication.deviceService(device).connect();
+            asked++;
+        }
+        return asked;
+    }
+
     /** True once for a listing that starts soon after {@link #askWatchForEveryRun()}. */
     public static boolean takeEveryRunRequest() {
         final long at = everyRunAskedAt;

@@ -198,6 +198,9 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 answer(reply, id, ok());
                 return;
             }
+            case "connect":
+                answer(reply, id, ok().put("asked", BeagleFit.connectWatches()));
+                return;
             case "send":
                 BeagleFit.scheduleUpload(app, true);
                 answer(reply, id, ok());
@@ -320,6 +323,7 @@ final class BeagleFitBridge implements WebViewCompat.WebMessageListener {
                 .put("lastAt", BeagleFitStore.lastResultTime(app))
                 .put("setUp", !GBApplication.getPrefs().getBoolean("first_run", true))
                 .put("everyRun", true) // the "every" op is here (1.3.0)
+                .put("connect", true) // the "connect" op is here (1.3.2)
                 .put("weights", BeagleFitWeights.status(app));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // The "topBar" op is here (1.3.1); hidden once the member has minimized the connected notification.

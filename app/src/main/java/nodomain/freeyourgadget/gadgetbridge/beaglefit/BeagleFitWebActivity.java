@@ -290,9 +290,18 @@ public class BeagleFitWebActivity extends AppCompatActivity {
         web.onResume();
         // A new server address on the Beagle Fit screen: the page, its sign-in and the bridge's
         // origin all belong to the old one.
-        if (!Objects.equals(baseUrl, BeagleFitStore.baseUrl(this))) recreate();
+        if (!Objects.equals(baseUrl, BeagleFitStore.baseUrl(this))) {
+            recreate();
+            return;
+        }
+        // Opening the app is a good time to find the watch: a member shouldn't have to tap its card.
+        try {
+            BeagleFit.connectWatches();
+        } catch (final Exception e) {
+            LOG.warn("Beagle Fit: could not connect the watch", e);
+        }
         // Health Connect always lets an app read while it's open: new weigh-ins come in now.
-        else if (BeagleFitWeights.isOn(this)) BeagleFitWeights.collectAsync(this);
+        if (BeagleFitWeights.isOn(this)) BeagleFitWeights.collectAsync(this);
     }
 
     @Override
